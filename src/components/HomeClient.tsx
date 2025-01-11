@@ -17,10 +17,18 @@ import { smoothScroll } from "@/utils/smoothScroll";
 import { Gem, Menu } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import HammertonLogo from "../../public/HammertonLogo.svg";
 
 interface HomeClientProps {
   privacyPolicyContent: string;
 }
+
+const toBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result?.toString() ?? "");
+  reader.onerror = reject;
+});
 
 export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
   const [jewelryType, setJewelryType] = useState("necklace");
@@ -39,12 +47,15 @@ export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
+  const [imageFileType, setImageFileType] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+
   useEffect(() => {
     // Track page view
     gtag.pageview(window.location.pathname);
   }, []);
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFile(file);
@@ -52,7 +63,8 @@ export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
       setIsDesignGenerated(true);
       setDesignSource("upload");
       setPromotionalText("");
-
+      setImageFileType(file.type);  
+      setImageBase64(await toBase64(file));
       // Track upload event
       gtag.event({
         action: "upload_design",
@@ -146,8 +158,14 @@ export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
     <div className="min-h-screen bg-[#F5F5F0] font-serif">
       <header className="bg-[#F5F5F0] border-b border-[#14213D] sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-2xl sm:text-3xl font-bold text-[#14213D] tracking-wide">
-            Hammerton & Bey
+          <div className="flex items-center space-x-2">
+            <Image
+              src={HammertonLogo}
+              alt="Hammerton & Bey"
+              width={240}
+              height={53}
+              className="h-14 w-auto"
+            />
           </div>
           <nav className="hidden sm:block">
             <ul className="flex space-x-6 text-lg">
@@ -508,16 +526,23 @@ export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
         </section>
       </main>
 
-      <footer className="bg-[#14213D] text-white py-6 sm:py-8">
+      <footer className="bg-[#14213D] text-white py-8">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+            
             <div>
-              <h3 className="text-xl font-bold mb-4">Hammerton & Bey</h3>
+            <Image
+                src={HammertonLogo}
+                alt="Hammerton & Bey"
+                width={280}
+                height={62}
+                className="h-16 w-auto brightness-0 invert"
+              />
               <p className="text-sm">Crafting timeless elegance since 1969</p>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-              <p className="text-sm mb-2">Email: info@hammertonandbey.com</p>
+              <p className="text-sm mb-2">Email: info@hammertonbey.com</p>
               <p className="text-sm mb-2">Phone: +1 331 296-3620</p>
               <p className="text-sm">
                 Address: Acı çeşme Sokak, Zincirli han no:13, Grand Bazaar,
@@ -626,7 +651,9 @@ export function HomeClient({ privacyPolicyContent }: HomeClientProps) {
       <ContactFormPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        imageUrl={designImageUrl || ""}
+        imageUrl={designImageUrl ?? undefined}
+        imageFileType={imageFileType ?? undefined}
+        imageBase64={imageBase64 ?? undefined}
         jewelryType={jewelryType}
       />
       <TermsOfServiceModal

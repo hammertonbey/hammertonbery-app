@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -17,7 +18,9 @@ import { useState } from "react";
 interface ContactFormPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  imageUrl: string;
+  imageUrl?: string;
+  imageFileType?: string;
+  imageBase64?: string;
   jewelryType: string;
 }
 
@@ -25,6 +28,8 @@ export function ContactFormPopup({
   isOpen,
   onClose,
   imageUrl,
+  imageFileType,
+  imageBase64,
   jewelryType,
 }: ContactFormPopupProps) {
   const [email, setEmail] = useState("");
@@ -55,6 +60,8 @@ export function ContactFormPopup({
           jewelryType,
           size,
           imageUrl,
+          imageFileType,
+          imageBase64,
         }),
       });
 
@@ -104,7 +111,7 @@ export function ContactFormPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-[#F5F5F0]">
+      <DialogContent className="sm:max-w-[500px] bg-[#F5F5F0] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#14213D]">
             Request a Quote
@@ -113,80 +120,82 @@ export function ContactFormPopup({
             Fill out the form below to submit your design request.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="mb-6">
-            <Label className="text-[#14213D] block mb-2">Your Design</Label>
-            <div className="flex justify-center items-center bg-white p-2 rounded-lg border border-[#14213D] h-64">
-              <Image
-                src={imageUrl}
-                alt="Your design"
-                width={250}
-                height={250}
-                className="rounded-lg object-contain"
+        <ScrollArea className="h-full max-h-[calc(90vh-120px)]">
+          <form onSubmit={handleSubmit} className="space-y-4 px-1">
+            <div className="mb-6">
+              <Label className="text-[#14213D] block mb-2">Your Design</Label>
+              <div className="flex justify-center items-center bg-white p-2 rounded-lg border border-[#14213D] h-64">
+                <Image
+                  src={imageUrl ?? ""}
+                  alt="Your design"
+                  width={250}
+                  height={250}
+                  className="rounded-lg object-contain"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="name" className="text-[#14213D]">
+                Contact Name
+              </Label>
+              <Input
+                id="name"
+                type="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="border-[#14213D]"
               />
             </div>
-          </div>
-          <div>
-            <Label htmlFor="name" className="text-[#14213D]">
-              Email
-            </Label>
-            <Input
-              id="name"
-              type="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="border-[#14213D]"
-            />
-          </div>
-          <div>
-            <Label htmlFor="email" className="text-[#14213D]">
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border-[#14213D]"
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone" className="text-[#14213D]">
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              className="border-[#14213D]"
-            />
-          </div>
-          <GoldKaratPicker value={goldKarat} onChange={setGoldKarat} />
-          {renderSizeSelector()}
-          <div>
-            <Label htmlFor="notes" className="text-[#14213D]">
-              Additional Notes
-            </Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any specific requirements or questions?"
-              className="border-[#14213D] h-32"
-            />
-          </div>
-          <Button
-            type="submit"
-            className="bg-[#14213D] hover:bg-[#FCA311] text-white transition-colors w-full"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Request"}
-          </Button>
-        </form>
+            <div>
+              <Label htmlFor="email" className="text-[#14213D]">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="border-[#14213D]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone" className="text-[#14213D]">
+                Phone Number
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="border-[#14213D]"
+              />
+            </div>
+            <GoldKaratPicker value={goldKarat} onChange={setGoldKarat} />
+            {renderSizeSelector()}
+            <div>
+              <Label htmlFor="notes" className="text-[#14213D]">
+                Additional Notes
+              </Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any specific requirements or questions?"
+                className="border-[#14213D] h-32"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="bg-[#14213D] hover:bg-[#FCA311] text-white transition-colors w-full mb-4"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Request"}
+            </Button>
+          </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
