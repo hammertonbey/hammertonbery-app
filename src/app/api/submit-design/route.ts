@@ -76,7 +76,9 @@ export async function POST(request: Request) {
     const table = base(TABLE_NAME);
 
     // Process image if provided
-    const attachments: Attachment[] = imageUrl ? [{ url: imageUrl }] : [];
+    const attachments: Attachment[] = imageUrl
+      ? [{ url: imageUrl } as Attachment]
+      : [];
 
     // Create record with attachments
     const createFields: FieldSet = {
